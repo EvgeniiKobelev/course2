@@ -1,26 +1,7 @@
 <template>
   <div class="container column">
-    <form class="card card-w30" @submit.prevent="createBlock">
-      <div class="form-control">
-        <label for="type">Тип блока</label>
-        <select id="type" v-model="type">
-          <option value="title">Заголовок</option>
-          <option value="subtitle">Подзаголовок</option>
-          <option value="avatar">Аватар</option>
-          <option value="text">Текст</option>
-        </select>
-      </div>
-
-      <div class="form-control">
-        <label for="value">Значение</label>
-        <textarea id="value" rows="3" v-model.trim="value"></textarea>
-      </div>
-
-      <button type="submit" class="btn primary" :disabled="value.length <= 3">
-        Добавить
-      </button>
-    </form>
-    <app-rezume :blocks="blocks" :type="type" :alert="alert"></app-rezume>
+    <app-form @addBlock="createBlock"></app-form>
+    <app-rezume :blocks="blocks" :alert="alert"></app-rezume>
   </div>
 
   <app-comments :comments="comments" @load="loadComments"></app-comments>
@@ -32,12 +13,11 @@
 import AppRezume from './components/AppRezume'
 import axios from 'axios'
 import AppComments from './components/AppComments.vue'
+import AppForm from './components/AppForm.vue'
 export default {
-  components: { AppRezume, AppComments },
+  components: { AppRezume, AppComments, AppForm },
   data () {
     return {
-      type: 'title',
-      value: '',
       blocks: [],
       comments: [],
       loading: false,
@@ -84,7 +64,7 @@ export default {
         this.alert = 'Что-то пошло не так'
       }
     },
-    async createBlock () {
+    async createBlock (v) {
       const response = await fetch(
         'https://vuejs-with-http-default-rtdb.firebaseio.com/rezume.json',
         {
@@ -93,19 +73,17 @@ export default {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            typeBlock: this.type,
-            valueBlock: this.value
+            typeBlock: v.typeBlock,
+            valueBlock: v.valueBlock
           })
         }
       )
       const firebaseData = await response.json()
       this.blocks.push({
-        typeBlock: this.type,
-        valueBlock: this.value,
+        typeBlock: v.typeBlock,
+        valueBlock: v.valueBlock,
         id: firebaseData.name
       })
-      this.type = 'title'
-      this.value = ''
     }
   }
 }

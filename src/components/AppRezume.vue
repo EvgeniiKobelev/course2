@@ -25,6 +25,6 @@
 </template>
 <script>
 export default {
-  props: ['blocks', 'type', 'alert']
+  props: ['blocks', 'alert']
 }
 </script>
